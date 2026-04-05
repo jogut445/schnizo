@@ -50,5 +50,5 @@ SN_RISCV_LDFLAGS += -lm
 SN_RISCV_ARFLAGS := rcs
 
 # Objdump flags
-SN_RISCV_OBJDUMP_FLAGS := --mcpu=$(SN_MCPU)
+SN_RISCV_OBJDUMP_FLAGS := --mcpu=$(SN_MCPU) --mattr=+v
 SN_RISCV_OBJDUMP_FLAGS += -D
