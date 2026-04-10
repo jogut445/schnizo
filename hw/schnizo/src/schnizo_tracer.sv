@@ -5,13 +5,15 @@
 // pragma translate_off
 
 // Schnizo core tracer.
-module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
+module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; import spatz_pkg::*; #(
   parameter int unsigned NofAlus    = 3,
   parameter int unsigned NofLsus    = 1,
   parameter int unsigned NofFpus    = 1,
   parameter int unsigned AluNofRss  = 3,
   parameter int unsigned LsuNofRss  = 2,
   parameter int unsigned FpuNofRss  = 4,
+  parameter int unsigned SpatzNofRss = 4,
+  parameter int unsigned NrParallelInstructions = 8,
   parameter int unsigned NofOperandIfs = 1,
   parameter bit          Xfrep      = 1
 ) (
@@ -24,9 +26,11 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
   input  issue_alu_trace_t        alu_trace [NofAlus],
   input  issue_lsu_trace_t        lsu_trace [NofLsus],
   input  issue_fpu_trace_t        fpu_trace [NofFpus],
+  input  issue_spatz_trace_t      spatz_trace,
   input  issue_alu_trace_t        rss_alu_traces [NofAlus][AluNofRss],
   input  issue_lsu_trace_t        rss_lsu_traces [NofLsus][LsuNofRss],
   input  issue_fpu_trace_t        rss_fpu_traces [NofFpus][FpuNofRss],
+  input  issue_spatz_trace_t      rss_spatz_traces [SpatzNofRss],  
   input  issue_csr_trace_t        csr_trace,
   input  issue_acc_trace_t        acc_trace,
   input  retire_fu_trace_t        alu_retirements [NofAlus],
@@ -34,17 +38,23 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
   input  retire_fu_trace_t        fpu_retirements [NofFpus],
   input  retire_fu_trace_t        csr_retirement,
   input  retire_fu_trace_t        acc_retirement,
+  input  internal_retire_spatz_trace_t spatz_retirement [NrParallelInstructions],
   input  wb_fu_trace_t            alu_wb_trace,
   input  wb_fu_trace_t            lsu_wb_trace,
   input  wb_fu_trace_t            fpu_wb_trace,
   input  wb_fu_trace_t            csr_wb_trace,
   input  wb_fu_trace_t            acc_wb_trace,
-  input  resreq_trace_t           alu_resreq_traces [NofAlus][AluNofRss][NofOperandIfs],
-  input  resreq_trace_t           lsu_resreq_traces [NofLsus][LsuNofRss][NofOperandIfs],
-  input  resreq_trace_t           fpu_resreq_traces [NofFpus][FpuNofRss][NofOperandIfs],
-  input  rescap_trace_t           alu_rescap_traces [NofAlus][AluNofRss],
-  input  rescap_trace_t           lsu_rescap_traces [NofLsus][LsuNofRss],
-  input  rescap_trace_t           fpu_rescap_traces [NofFpus][FpuNofRss]
+  input  wb_fu_trace_t            spatz_wb_trace,
+  input  resreq_trace_t           alu_resreq_traces   [NofAlus][AluNofRss][NofOperandIfs],
+  input  resreq_trace_t           lsu_resreq_traces   [NofLsus][LsuNofRss][NofOperandIfs],
+  input  resreq_trace_t           fpu_resreq_traces   [NofFpus][FpuNofRss][NofOperandIfs],
+  input  resreq_trace_t           spatz_resreq_traces [SpatzNofRss][NofOperandIfs],
+  input  rescap_trace_t           alu_rescap_traces   [NofAlus][AluNofRss],
+  input  rescap_trace_t           lsu_rescap_traces   [NofLsus][LsuNofRss],
+  input  rescap_trace_t           fpu_rescap_traces   [NofFpus][FpuNofRss],
+  input  rescap_trace_t           spatz_rescap_traces [SpatzNofRss],
+  input  op_e                     spatz_instrs_names  [NrParallelInstructions],
+  input  internal_issue_spatz_trace_t internal_spatz_traces [NrParallelInstructions]
 );
 
   // The tracer first extracts all signals of interest and groups them by functional unit.
@@ -79,8 +89,8 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
     schnizo_dispatch_trace_t dispatch_trace;
   } lcp_dispatch_detail_t;
 
-  localparam integer unsigned NofFus = NofAlus + NofLsus + NofFpus;
-
+  localparam integer unsigned NofFus = NofAlus + NofLsus + NofFpus + (RVV ? 1 : 0);;
+  
   lcp_dispatch_detail_t lcp_dispatch_queue[NofFus][$];
 
   // verilog_lint: waive-start always-ff-non-blocking
@@ -94,6 +104,14 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
       // Always generate the core trace. This trace serves as the basis of the trace event.
       // This trace is extended with the details of the active FU.
       trace_header = format_trace_header($time, cycle, core_trace);
+
+      if (RVV) begin: gen_internal_issues
+        for (int i = 0; i < NrParallelInstructions; i++) begin
+          write_trace_event(file_id, trace_header, "internal_spatz_issue",
+                    format_internal_spatz_trace(internal_spatz_traces[i], i, spatz_instrs_names[i].name()),
+                    internal_spatz_traces[i].valid);
+        end
+      end
 
       lcp_details = '{
         header: trace_header,
@@ -135,6 +153,15 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
           end
         end
       end
+      if (RVV) begin
+        for (int rss = 0; rss < SpatzNofRss; rss++) begin
+          for (int con = 0; con < NofOperandIfs; con++) begin
+            write_trace_event(file_id, trace_header, "resreq",
+                              format_resreq_trace(spatz_resreq_traces[rss][con]),
+                              spatz_resreq_traces[rss][con].valid);
+          end
+        end
+      end
 
       // Trace events are active depending on CPU states.
       if (core_trace.state inside {LoopRegular, LoopHwLoop}) begin
@@ -155,6 +182,8 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
         end
         dispatch_event = $sformatf("%s%s", dispatch_event, format_csr_trace(csr_trace));
         dispatch_event = $sformatf("%s%s", dispatch_event, format_acc_trace(acc_trace));
+
+        if (RVV) dispatch_event = $sformatf("%s%s", dispatch_event, format_spatz_trace(spatz_trace));
 
         write_trace_event(file_id, trace_header, "dispatch", dispatch_event, dispatch_trace.valid);
       end else if (core_trace.state inside {LoopLcp1, LoopLcp2}) begin
@@ -205,6 +234,20 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
           end
         end
 
+        if (RVV) begin
+          for (int rss = 0; rss < SpatzNofRss; rss++) begin
+            if (rss_spatz_traces[rss].valid) begin
+              details = lcp_dispatch_queue[NofAlus + NofLsus + NofFpus].pop_front();
+              dispatch_event = format_dispatch_extras(details.dispatch_trace);
+
+              dispatch_event = $sformatf("%s%s", dispatch_event,
+                                        format_spatz_trace(rss_spatz_traces[rss]));
+              write_trace_event(file_id, details.header, "dispatch",
+                                dispatch_event, details.dispatch_trace.valid);
+            end
+          end
+        end
+
         // CSR and ACC instructions are not supported in FREP but can still execute (fallback in
         // hw loop mode). These are not cut and thus dispatch immediately.
         dispatch_event = format_dispatch_extras(dispatch_trace);
@@ -237,6 +280,15 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
                              rss_fpu_traces[fpu][rss].valid);
           end
         end
+
+        if (RVV) begin
+          for (int rss = 0; rss < SpatzNofRss; rss++) begin
+              write_trace_event(file_id, trace_header, "dispatch",
+                              format_spatz_trace(rss_spatz_traces[rss]),
+                              rss_spatz_traces[rss].valid);
+            end
+        end
+
         // No CSR and ACC events possible
       end else begin
         $warning("Current CPU state (%s) not supported by tracer!",
@@ -253,6 +305,9 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
       write_trace_event(file_id, trace_header, "writeback",
                         format_wb_fu_trace(fpu_wb_trace, "FPU"),
                         fpu_wb_trace.valid);
+      if (RVV) write_trace_event(file_id, trace_header, "writeback",
+                        format_wb_fu_trace(spatz_wb_trace, "SPATZ"),
+                        spatz_wb_trace.valid);
       write_trace_event(file_id, trace_header, "writeback",
                         format_wb_fu_trace(csr_wb_trace, "CSR"),
                         csr_wb_trace.valid);
@@ -292,6 +347,23 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
                             fpu_rescap_traces[fpu][rss].valid);
         end
       end
+
+      if (RVV) begin
+        for (int i = 0; i < NrParallelInstructions; i++) begin
+                write_trace_event(file_id, trace_header, "internal_spatz_retirement",
+                          format_int_spatz_retire_trace(spatz_retirement[i]),
+                          spatz_retirement[i].valid);
+        end
+
+
+
+        for (int rss = 0; rss < SpatzNofRss; rss++) begin
+          write_trace_event(file_id, trace_header, "rescap",
+                            format_rescap_trace(spatz_rescap_traces[rss]),
+                            spatz_rescap_traces[rss].valid);
+        end
+      end
+
       write_trace_event(file_id, trace_header, "retirement",
                         format_fu_retire_trace(csr_retirement),
                         csr_retirement.valid);

@@ -1140,55 +1140,8 @@ localparam int unsigned MaxNofRss =
   ////////////
 
   // Move to tracer FILE!!!!!
-  typedef struct {
-    logic   valid; // high if handshake happens
-    longint instr_iter;
-    string  producer;
-    longint spatz_opa;
-    longint spatz_opb;
-    spatz_id_t internal_spatz_id; // if the instruction will write back a result
-  } issue_spatz_trace_t;
 
-  function automatic string format_spatz_trace(issue_spatz_trace_t trace);
-    string extras = "";
-    if (!trace.valid) begin
-      return "";
-    end
-    extras = $sformatf("%s'%s':0x%0x, ", extras, "instr_iter", trace.instr_iter);
-    extras = $sformatf("%s'%s':\"%s\", ", extras, "producer", trace.producer);
-    extras = $sformatf("%s'%s':0x%0x, ", extras, "spatz_opa", trace.spatz_opa);
-    extras = $sformatf("%s'%s':0x%0x, ", extras, "spatz_opb", trace.spatz_opb);
-    extras = $sformatf("%s'%s':0x%0x, ", extras, "internal_spatz_id", trace.internal_spatz_id);
-    return extras;
-  endfunction
-
-  typedef struct {
-    logic valid; // high if handshake happens
-    string name;
-  } internal_issue_spatz_trace_t;//It is actually just a one bit flag. Kept it as a struct for consistency with the other tracing structures
-  function automatic string format_internal_spatz_trace(internal_issue_spatz_trace_t trace, int id, string name);
-    string extras = "";
-    if (!trace.valid) begin
-      return "prova";
-    end
-    extras = $sformatf("%s'%s':0x%0x, ", extras, "id", id);
-    extras = $sformatf("%s'%s':\"%s\", ", extras, "op", name);
-    return extras;
-  endfunction
-
-  typedef struct {
-    logic valid;
-    int id;
-  } internal_retire_spatz_trace_t;
-
-  function automatic string format_int_spatz_retire_trace(internal_retire_spatz_trace_t trace);
-    string extras = "";
-    if (!trace.valid) begin
-      return "";
-    end
-    extras = $sformatf("%s'%s':\"%0d\", ", extras, "id", trace.id);
-    return extras;
-  endfunction
+  
 
   // pragma translate_off
 
@@ -1626,6 +1579,8 @@ localparam int unsigned MaxNofRss =
     .AluNofRss      (AluNofRss),
     .LsuNofRss      (LsuNofRss),
     .FpuNofRss      (FpuNofRss),
+    .SpatzNofRss    (SpatzNofRss),
+    .NrParallelInstructions (NrParallelInstructions),
     .NofOperandIfs  (NofOperandIfs),
     .Xfrep          (Xfrep)
   ) i_tracer (
@@ -1638,9 +1593,11 @@ localparam int unsigned MaxNofRss =
     .alu_trace          (alu_trace),
     .lsu_trace          (lsu_trace),
     .fpu_trace          (fpu_trace),
+    .spatz_trace        (spatz_trace),
     .rss_alu_traces     (rss_alu_traces),
     .rss_lsu_traces     (rss_lsu_traces),
     .rss_fpu_traces     (rss_fpu_traces),
+    .rss_spatz_traces   (rss_spatz_traces),
     .csr_trace          (csr_trace),
     .acc_trace          (acc_trace),
     .alu_retirements    (alu_retirements),
@@ -1648,17 +1605,23 @@ localparam int unsigned MaxNofRss =
     .fpu_retirements    (fpu_retirements),
     .csr_retirement     (csr_retirement),
     .acc_retirement     (acc_retirement),
+    .spatz_retirement   (spatz_retirement),
     .alu_wb_trace       (alu_wb_trace),
     .lsu_wb_trace       (lsu_wb_trace),
     .fpu_wb_trace       (fpu_wb_trace),
     .csr_wb_trace       (csr_wb_trace),
     .acc_wb_trace       (acc_wb_trace),
+    .spatz_wb_trace     (spatz_wb_trace),
     .alu_resreq_traces  (alu_resreq_traces),
     .lsu_resreq_traces  (lsu_resreq_traces),
     .fpu_resreq_traces  (fpu_resreq_traces),
+    .spatz_resreq_traces(spatz_resreq_traces),
     .alu_rescap_traces  (alu_rescap_traces),
     .lsu_rescap_traces  (lsu_rescap_traces),
-    .fpu_rescap_traces  (fpu_rescap_traces)
+    .fpu_rescap_traces  (fpu_rescap_traces),
+    .spatz_rescap_traces(spatz_rescap_traces),
+    .spatz_instrs_names (spatz_instrs_names),
+    .internal_spatz_traces(internal_spatz_traces)
   );
 
   // pragma translate_on

@@ -30,7 +30,7 @@
 // #define LMUL "8"
 // #endif
 
-#define LMUL "NLMUL"
+#define LMUL "4"
 
 #define SETVLEN(rd, rs) asm volatile("vsetvli %[vl], %[rvl], e64, m" LMUL ", ta, ma" \
                  : [vl] "=r"(rd) \

@@ -7,7 +7,7 @@
 // Contains type definitions and formatting functions for the Schnizo core tracer.
 package schnizo_tracer_pkg;
   import schnizo_pkg::*;
-
+  import spatz_pkg::*;
   // pragma translate_off
 
   //////////////////////
@@ -76,6 +76,15 @@ package schnizo_tracer_pkg;
     longint fpu_dst_fmt;
     longint fpu_int_fmt;
   } issue_fpu_trace_t;
+  
+  typedef struct {
+    logic   valid; // high if handshake happens
+    longint instr_iter;
+    string  producer;
+    longint spatz_opa;
+    longint spatz_opb;
+    spatz_id_t internal_spatz_id; // if the instruction will write back a result
+  } issue_spatz_trace_t;
 
   typedef struct {
     logic   valid; // high if handshake happens
@@ -126,6 +135,17 @@ package schnizo_tracer_pkg;
     longint rd_is_fp;
     longint result;
   } rescap_trace_t;
+
+  // Spatz internal Traces
+  typedef struct {
+    logic valid; // high if handshake happens
+    string name;
+  } internal_issue_spatz_trace_t;//It is actually just a one bit flag. Kept it as a struct for consistency with the other tracing structures
+ 
+  typedef struct {
+    logic valid;
+    int id;
+  } internal_retire_spatz_trace_t;
 
   ///////////////
   // Functions //
@@ -285,6 +305,40 @@ package schnizo_tracer_pkg;
       // close the extra key value list
       $fwrite(file_id,  $sformatf("%s}\n", trace_event));
     end
+  endfunction
+
+  // Spatz Traces
+
+  function automatic string format_spatz_trace(issue_spatz_trace_t trace);
+    string extras = "";
+    if (!trace.valid) begin
+      return "";
+    end
+    extras = $sformatf("%s'%s':0x%0x, ", extras, "instr_iter", trace.instr_iter);
+    extras = $sformatf("%s'%s':\"%s\", ", extras, "producer", trace.producer);
+    extras = $sformatf("%s'%s':0x%0x, ", extras, "spatz_opa", trace.spatz_opa);
+    extras = $sformatf("%s'%s':0x%0x, ", extras, "spatz_opb", trace.spatz_opb);
+    extras = $sformatf("%s'%s':0x%0x, ", extras, "internal_spatz_id", trace.internal_spatz_id);
+    return extras;
+  endfunction
+
+  function automatic string format_internal_spatz_trace(internal_issue_spatz_trace_t trace, int id, string name);
+    string extras = "";
+    if (!trace.valid) begin
+      return "prova";
+    end
+    extras = $sformatf("%s'%s':0x%0x, ", extras, "id", id);
+    extras = $sformatf("%s'%s':\"%s\", ", extras, "op", name);
+    return extras;
+  endfunction
+
+  function automatic string format_int_spatz_retire_trace(internal_retire_spatz_trace_t trace);
+    string extras = "";
+    if (!trace.valid) begin
+      return "";
+    end
+    extras = $sformatf("%s'%s':\"%0d\", ", extras, "id", trace.id);
+    return extras;
   endfunction
 
   // pragma translate_on
