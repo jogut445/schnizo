@@ -164,6 +164,39 @@ sources:
       - hw/snitch_fp_ss/src/snitch_sequencer.sv
       # Level 1
       - hw/snitch_fp_ss/src/snitch_fp_ss.sv
+  - files:
+    # Level 0
+    - hw/spatz/hw/ip/spatz/src/reorder_buffer.sv
+    - hw/spatz/hw/ip/spatz/src/rvv_pkg.sv
+    # Level 1
+    - hw/spatz/hw/ip/spatz/src/generated/spatz_pkg.sv
+    - hw/spatz/hw/ip/spatz/src/spatz_serdiv.sv
+    # Level 2
+    - hw/spatz/hw/ip/spatz/src/spatz_decoder.sv
+    - hw/spatz/hw/ip/spatz/src/spatz_simd_lane.sv
+    - target: fpga
+      files:
+        - hw/spatz/hw/ip/spatz/src/vregfile_fpga.sv
+    - target: not(fpga)
+      files:
+        - hw/spatz/hw/ip/spatz/src/vregfile.sv
+    # Level 3
+    - hw/spatz/hw/ip/spatz/src/spatz_fpu_sequencer.sv
+    - hw/spatz/hw/ip/spatz/src/spatz_ipu.sv
+    - hw/spatz/hw/ip/spatz/src/spatz_vfu.sv
+    - hw/spatz/hw/ip/spatz/src/spatz_vlsu.sv
+    - hw/spatz/hw/ip/spatz/src/spatz_doublebw_vlsu.sv
+    - hw/spatz/hw/ip/spatz/src/spatz_vrf.sv
+    - hw/spatz/hw/ip/spatz/src/spatz_vsldu.sv
+    # Level 4
+    - hw/spatz/hw/ip/spatz/src/spatz_controller.sv
+    # Level 5
+    - hw/spatz/hw/ip/spatz/src/spatz.sv
+    # Level 6
+    - target: mempool
+      files:
+      - hw/spatz/hw/ip/spatz_cc/src/spatz_mempool_cc.sv
+
 
   # schnizo
   - files:

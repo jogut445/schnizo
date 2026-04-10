@@ -115,21 +115,7 @@ packages:
       Git: https://github.com/pulp-platform/scm.git
     dependencies:
     - tech_cells_generic
-  spatz:
-    revision: null
-    version: null
-    source:
-      Path: hw/spatz
-    dependencies:
-    - axi
-    - axi_riscv_atomics
-    - cluster_icache
-    - common_cells
-    - fpnew
-    - idma
-    - register_interface
-    - riscv-dbg
-    - tech_cells_generic
+
   tech_cells_generic:
     revision: 7968dd6e6180df2c644636bc6d2908a49f2190cf
     version: 0.2.13

@@ -1470,7 +1470,7 @@ module schnizo_fu_stage import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
   };
 
   assign spatz_result = acc_resp.data;
-  assign spatz_result_tag = {
+  assign spatz_result_tag = '{
     dest_reg: acc_resp.id,
     dest_reg_is_fp: acc_resp.is_fp,
     is_branch: '0,
