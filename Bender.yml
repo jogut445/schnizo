@@ -195,7 +195,7 @@ sources:
       # Level 6
       - target: mempool
         files:
-        - hw/spatz/hw/ip/spatz_cc/src/spatz_mempool_cc.sv
+          - hw/spatz/hw/ip/spatz_cc/src/spatz_mempool_cc.sv
 
 
   # schnizo

@@ -46,8 +46,8 @@ int main() {
         // }
 
         asm volatile("vsetvli  %[rvl],  %[rdvl], e32, m8, ta, ma       \n"
-                     : [rvl] "+r"(vl)
-                     : [rdvl] "r"(128));
+                     : [ rvl ] "+r"(vl)
+                     : [ rdvl ] "r"(128));
 
         // Use temporaries so we can mark them read-write in inline asm
         int *xa = x;
@@ -74,8 +74,8 @@ int main() {
             "vse32.v  v8,    (%[ya])                 \n"
             "add     %[xa], %[xa],   %[inc]   \n"
             "add     %[ya], %[ya],   %[inc]   \n"
-            : [rvl] "+r"(vl), [xa] "+r"(xa), [ya] "+r"(ya)
-            : [n_frep] "r"(iter), [inc] "r"(inc), [a] "r"(2)
+            : [ rvl ] "+r"(vl), [ xa ] "+r"(xa), [ ya ] "+r"(ya)
+            : [ n_frep ] "r"(iter), [ inc ] "r"(inc), [ a ] "r"(2)
             : "memory");
 
         // for(i=0; i<avl; i++) {

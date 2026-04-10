@@ -17,8 +17,8 @@ int main() {
 
         unsigned volatile int max_vl;
         asm volatile("vsetvli  %[rvl],  %[rdvl], e64, m1, ta, ma       \n"
-                     : [rvl] "+r"(max_vl)
-                     : [rdvl] "r"(-1));
+                     : [ rvl ] "+r"(max_vl)
+                     : [ rdvl ] "r"(-1));
 
         double* x_addr = x;
         double* y_addr = y;
@@ -42,17 +42,17 @@ int main() {
             "vse64.v  v8,    (%[za])          \n"
             "add     %[za], %[za],   %[inc]   \n"
             // Outputs
-            : [xa] "+r"(x_addr), [ya] "+r"(y_addr), [za] "+r"(z_addr)
+            : [ xa ] "+r"(x_addr), [ ya ] "+r"(y_addr), [ za ] "+r"(z_addr)
             // Inputs
-            :
-            [n_frep] "r"(n_vec_whole_iter - 1), [a] "f"(a), [inc] "r"(increment)
+            : [ n_frep ] "r"(n_vec_whole_iter - 1), [ a ] "f"(a),
+              [ inc ] "r"(increment)
             // Clobbers
             : "memory");
 
         if (n_remaining_elems != 0) {
             asm volatile("vsetvli  %[rvl],  %[rdvl], e64, m1, ta, ma       \n"
-                         : [rvl] "+r"(max_vl)
-                         : [rdvl] "r"(n_remaining_elems));
+                         : [ rvl ] "+r"(max_vl)
+                         : [ rdvl ] "r"(n_remaining_elems));
 
             asm volatile(
                 // Code
@@ -61,9 +61,9 @@ int main() {
                 "vfmacc.vf v8,    %[a],    v0     \n"
                 "vse64.v  v8,    (%[za])          \n"
                 // Outputs
-                : [xa] "+r"(x_addr), [ya] "+r"(y_addr), [za] "+r"(z_addr)
+                : [ xa ] "+r"(x_addr), [ ya ] "+r"(y_addr), [ za ] "+r"(z_addr)
                 // Inputs
-                : [a] "f"(a)
+                : [ a ] "f"(a)
                 // Clobbers
                 : "memory");
         }

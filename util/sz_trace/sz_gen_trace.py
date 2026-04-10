@@ -269,14 +269,10 @@ def handle_dispatch_event(sim_time, cycle, priv_lvl, loop_state, extras,
 
     # SPATZ
     is_spatz = False
-    spatz_id = ""
     if ('fu_type' in extras):
         is_spatz = extras['fu_type'] in {FU_SPATZ}
-        if is_spatz and 'disp_resp' in extras:
-            spatz_id = extras['disp_resp']
     elif ('producer' in extras):
         is_spatz = extras['producer'].startswith(FU_SPATZ)
-
     if (is_spatz):
         perf_metrics[-1]['spatz_issues'] += 1
 
