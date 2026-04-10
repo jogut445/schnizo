@@ -92,6 +92,7 @@ class RiscvISA:
     v: bool = False
     isa_string = re.compile(r"^rv32(i|e)([m|a|f|d|v]*)$")
 
+
 def parse_isa_string(s):
     """Construct an `RiscvISA` object from a string"""
     s.lower()

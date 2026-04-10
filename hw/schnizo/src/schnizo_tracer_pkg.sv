@@ -76,7 +76,7 @@ package schnizo_tracer_pkg;
     longint fpu_dst_fmt;
     longint fpu_int_fmt;
   } issue_fpu_trace_t;
-  
+
   typedef struct {
     logic   valid; // high if handshake happens
     longint instr_iter;
@@ -141,7 +141,7 @@ package schnizo_tracer_pkg;
     logic valid; // high if handshake happens
     string name;
   } internal_issue_spatz_trace_t;//It is actually just a one bit flag. Kept it as a struct for consistency with the other tracing structures
- 
+
   typedef struct {
     logic valid;
     int id;

@@ -87,10 +87,10 @@ module schnizo_cc #(
   parameter int unsigned NumIntOutstandingMem   = 0,
   // SPATZ specific parameters
   parameter int unsigned NumSpatzFPUs           = 4,
-  parameter int unsigned NumSpatzIPUs           = 1, 
+  parameter int unsigned NumSpatzIPUs           = 1,
   /// Derived parameter for Spatz *Do not override*
   parameter int unsigned NumSpatzFUs            = (NumSpatzFPUs > NumSpatzIPUs) ? NumSpatzFPUs : NumSpatzIPUs,
-  parameter int unsigned NumMemPortsPerSpatz    = NumSpatzFUs,  
+  parameter int unsigned NumMemPortsPerSpatz    = NumSpatzFUs,
   /// Add isochronous clock-domain crossings e.g., make it possible to operate
   /// the core in a slower clock domain.
   parameter bit          IsoCrossing        = 0,
@@ -304,7 +304,7 @@ module schnizo_cc #(
     .barrier_o       (barrier_o),
     .barrier_i       (barrier_i),
     // TCDM Ports for SPATZ
-    .tcdm_req_o      (spatz_tcdm_req), 
+    .tcdm_req_o      (spatz_tcdm_req),
     .tcdm_rsp_i      (spatz_tcdm_rsp)
   );
 

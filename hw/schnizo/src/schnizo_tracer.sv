@@ -21,40 +21,40 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; import spatz
   input  logic rst_i,
   input  logic [31:0] hart_id_i,
   input  int unsigned dispatch_rs_id,
-  input  schnizo_core_trace_t     core_trace,
-  input  schnizo_dispatch_trace_t dispatch_trace,
-  input  issue_alu_trace_t        alu_trace [NofAlus],
-  input  issue_lsu_trace_t        lsu_trace [NofLsus],
-  input  issue_fpu_trace_t        fpu_trace [NofFpus],
-  input  issue_spatz_trace_t      spatz_trace,
-  input  issue_alu_trace_t        rss_alu_traces [NofAlus][AluNofRss],
-  input  issue_lsu_trace_t        rss_lsu_traces [NofLsus][LsuNofRss],
-  input  issue_fpu_trace_t        rss_fpu_traces [NofFpus][FpuNofRss],
-  input  issue_spatz_trace_t      rss_spatz_traces [SpatzNofRss],  
-  input  issue_csr_trace_t        csr_trace,
-  input  issue_acc_trace_t        acc_trace,
-  input  retire_fu_trace_t        alu_retirements [NofAlus],
-  input  retire_fu_trace_t        lsu_retirements [NofLsus],
-  input  retire_fu_trace_t        fpu_retirements [NofFpus],
-  input  retire_fu_trace_t        csr_retirement,
-  input  retire_fu_trace_t        acc_retirement,
+  input  schnizo_core_trace_t          core_trace,
+  input  schnizo_dispatch_trace_t      dispatch_trace,
+  input  issue_alu_trace_t             alu_trace [NofAlus],
+  input  issue_lsu_trace_t             lsu_trace [NofLsus],
+  input  issue_fpu_trace_t             fpu_trace [NofFpus],
+  input  issue_spatz_trace_t           spatz_trace,
+  input  issue_alu_trace_t             rss_alu_traces [NofAlus][AluNofRss],
+  input  issue_lsu_trace_t             rss_lsu_traces [NofLsus][LsuNofRss],
+  input  issue_fpu_trace_t             rss_fpu_traces [NofFpus][FpuNofRss],
+  input  issue_spatz_trace_t           rss_spatz_traces [SpatzNofRss],
+  input  issue_csr_trace_t             csr_trace,
+  input  issue_acc_trace_t             acc_trace,
+  input  retire_fu_trace_t             alu_retirements [NofAlus],
+  input  retire_fu_trace_t             lsu_retirements [NofLsus],
+  input  retire_fu_trace_t             fpu_retirements [NofFpus],
+  input  retire_fu_trace_t             csr_retirement,
+  input  retire_fu_trace_t             acc_retirement,
   input  internal_retire_spatz_trace_t spatz_retirement [NrParallelInstructions],
-  input  wb_fu_trace_t            alu_wb_trace,
-  input  wb_fu_trace_t            lsu_wb_trace,
-  input  wb_fu_trace_t            fpu_wb_trace,
-  input  wb_fu_trace_t            csr_wb_trace,
-  input  wb_fu_trace_t            acc_wb_trace,
-  input  wb_fu_trace_t            spatz_wb_trace,
-  input  resreq_trace_t           alu_resreq_traces   [NofAlus][AluNofRss][NofOperandIfs],
-  input  resreq_trace_t           lsu_resreq_traces   [NofLsus][LsuNofRss][NofOperandIfs],
-  input  resreq_trace_t           fpu_resreq_traces   [NofFpus][FpuNofRss][NofOperandIfs],
-  input  resreq_trace_t           spatz_resreq_traces [SpatzNofRss][NofOperandIfs],
-  input  rescap_trace_t           alu_rescap_traces   [NofAlus][AluNofRss],
-  input  rescap_trace_t           lsu_rescap_traces   [NofLsus][LsuNofRss],
-  input  rescap_trace_t           fpu_rescap_traces   [NofFpus][FpuNofRss],
-  input  rescap_trace_t           spatz_rescap_traces [SpatzNofRss],
-  input  op_e                     spatz_instrs_names  [NrParallelInstructions],
-  input  internal_issue_spatz_trace_t internal_spatz_traces [NrParallelInstructions]
+  input  wb_fu_trace_t                 alu_wb_trace,
+  input  wb_fu_trace_t                 lsu_wb_trace,
+  input  wb_fu_trace_t                 fpu_wb_trace,
+  input  wb_fu_trace_t                 csr_wb_trace,
+  input  wb_fu_trace_t                 acc_wb_trace,
+  input  wb_fu_trace_t                 spatz_wb_trace,
+  input  resreq_trace_t                alu_resreq_traces   [NofAlus][AluNofRss][NofOperandIfs],
+  input  resreq_trace_t                lsu_resreq_traces   [NofLsus][LsuNofRss][NofOperandIfs],
+  input  resreq_trace_t                fpu_resreq_traces   [NofFpus][FpuNofRss][NofOperandIfs],
+  input  resreq_trace_t                spatz_resreq_traces [SpatzNofRss][NofOperandIfs],
+  input  rescap_trace_t                alu_rescap_traces   [NofAlus][AluNofRss],
+  input  rescap_trace_t                lsu_rescap_traces   [NofLsus][LsuNofRss],
+  input  rescap_trace_t                fpu_rescap_traces   [NofFpus][FpuNofRss],
+  input  rescap_trace_t                spatz_rescap_traces [SpatzNofRss],
+  input  op_e                          spatz_instrs_names  [NrParallelInstructions],
+  input  internal_issue_spatz_trace_t  internal_spatz_traces [NrParallelInstructions]
 );
 
   // The tracer first extracts all signals of interest and groups them by functional unit.
@@ -89,8 +89,8 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; import spatz
     schnizo_dispatch_trace_t dispatch_trace;
   } lcp_dispatch_detail_t;
 
-  localparam integer unsigned NofFus = NofAlus + NofLsus + NofFpus + (RVV ? 1 : 0);;
-  
+  localparam integer unsigned NofFus = NofAlus + NofLsus + NofFpus + (RVV ? 1 : 0);
+
   lcp_dispatch_detail_t lcp_dispatch_queue[NofFus][$];
 
   // verilog_lint: waive-start always-ff-non-blocking
@@ -305,9 +305,11 @@ module schnizo_tracer import schnizo_pkg::*, schnizo_tracer_pkg::*; import spatz
       write_trace_event(file_id, trace_header, "writeback",
                         format_wb_fu_trace(fpu_wb_trace, "FPU"),
                         fpu_wb_trace.valid);
-      if (RVV) write_trace_event(file_id, trace_header, "writeback",
+      if (RVV) begin
+        write_trace_event(file_id, trace_header, "writeback",
                         format_wb_fu_trace(spatz_wb_trace, "SPATZ"),
                         spatz_wb_trace.valid);
+      end
       write_trace_event(file_id, trace_header, "writeback",
                         format_wb_fu_trace(csr_wb_trace, "CSR"),
                         csr_wb_trace.valid);

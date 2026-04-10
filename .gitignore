@@ -21,7 +21,9 @@ work.lib++/
 __pycache__
 gmon.out
 /simulation/
-/hw/spatz
+/hw/bootrom/snitch_bootrom.sv
+/hw/snitch_cluster/src/snitch_cluster_peripheral/snitch_cluster_peripheral_reg.sv
+/hw/snitch_cluster/src/snitch_cluster_peripheral/snitch_cluster_peripheral_reg_pkg.sv
 
 # Docs
 /site/

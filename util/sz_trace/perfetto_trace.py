@@ -20,13 +20,13 @@ TRUSTED_PKG_SEQ_ID = 22222
 def extract_fu_details(fu_string):
     """
     Extract functional unit details from a FU string.
-    
+
     Patterns supported:
     - Just letters: e.g., "ALU", "LSU", "FPU", "SPATZ", "CSR", "ACC", "NONE"
     - Letters + number: e.g., "ALU0", "LSU2", "SPATZ0"
     - Letters + number + dot + number: e.g., "ALU0.0", "LSU2.1", "SPATZ0.1"
     - Special internal patterns: e.g., "SPATZ_INT_0", "SPATZ_INT_1"
-    
+
     Returns:
         tuple: (track_name, slot_id) where track_name is the base track name
                and slot_id is either None or an integer
@@ -46,7 +46,7 @@ def extract_fu_details(fu_string):
         prefix, spatz_id = match.groups()
         track_name = f"{prefix}_{spatz_id}"
         return track_name, None
-    
+
     # Match slot pattern (letters + number + dot + number)
     elif match := re.match(fu_slot_pattern, fu_string):
         fu_type, fu_id, slot_id = match.groups()
@@ -54,19 +54,19 @@ def extract_fu_details(fu_string):
         slot_id = int(slot_id)
         track_name = f'{fu_type}{fu_id}'
         return track_name, slot_id
-    
+
     # Match ID pattern (letters + number)
     elif match := re.match(fu_id_pattern, fu_string):
         fu_type, fu_id = match.groups()
         fu_id = int(fu_id)
         track_name = f'{fu_type}{fu_id}'
         return track_name, None
-    
+
     # Match type pattern (just letters)
     elif match := re.match(fu_type_pattern, fu_string):
         fu_type = match.group(1)
         return fu_type, None
-    
+
     else:
         raise ValueError(f"Invalid FU string format to extract details: {fu_string}")
 
@@ -190,7 +190,7 @@ class PerfettoInstructionTrace(PerfettoTrace):
         self.add_event('NONE', TYPE_INSTANT, 0, "Start offset")
         self.add_track('Metrics')
         self.add_counter_track('IPC', 'Metrics', 'insns/cycle')
-        
+
         # Add a track for SPATZ internal events
         self.add_track('SPATZ_Internal', 'Instructions')
 
@@ -219,13 +219,13 @@ class PerfettoInstructionTrace(PerfettoTrace):
         """
         # Create a new track for an FU when first encountered
         fu_string, slot_id = extract_fu_details(fu)
-        
+
         # For SPATZ internal events, use the SPATZ_Internal parent track
         if fu_string.startswith('SPATZ_INT'):
             parent = 'SPATZ_Internal'
         else:
             parent = 'Instructions'
-        
+
         if fu_string not in self.tracks:
             self.add_track(fu_string, parent=parent)
 

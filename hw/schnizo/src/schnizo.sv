@@ -104,7 +104,7 @@ module schnizo import schnizo_pkg::*, schnizo_tracer_pkg::*, spatz_pkg::*; #(
   parameter int unsigned NumSpatzFUs         = (NumSpatzFPUs > NumSpatzIPUs) ? NumSpatzFPUs : NumSpatzIPUs,
   parameter int unsigned NumMemPortsPerSpatz = NumSpatzFUs,
   parameter int unsigned TCDMPorts           = RVV ? NumMemPortsPerSpatz + NofLsus : NofLsus,
-  
+
   localparam type addr_t = logic [AddrWidth-1:0],
   localparam type data_t = logic [DataWidth-1:0]
 ) (
@@ -337,8 +337,6 @@ module schnizo import schnizo_pkg::*, schnizo_tracer_pkg::*, spatz_pkg::*; #(
     end
   endfunction
 
-  // localparam integer unsigned MaxNofRss = RVV ? max4('{AluNofRss, LsuNofRss, FpuNofRss, SpatzNofRss}) : 
-  //                                             max3('{AluNofRss, LsuNofRss, FpuNofRss});
 
 localparam int unsigned MaxNofRss =
   RVV ?
@@ -902,7 +900,6 @@ localparam int unsigned MaxNofRss =
     .fpu_wb_result_tag_o  (fpu_result_tag),
     .fpu_wb_result_valid_o(fpu_result_valid),
     .fpu_wb_result_ready_i(fpu_result_ready),
-    
     // SPATZ WB
     .spatz_wb_result_o      (spatz_result),
     .spatz_wb_result_tag_o  (spatz_result_tag),
@@ -1056,8 +1053,7 @@ localparam int unsigned MaxNofRss =
     .retired_acc_o         (instr_retired_acc),
     .retired_spatz_o       (instr_retired_spatz)
   );
-  // CONTINUE HERE
-  
+
   /////////////////
   // Core Events //
   /////////////////
@@ -1138,12 +1134,6 @@ localparam int unsigned MaxNofRss =
   ////////////
   // Tracer //
   ////////////
-
-  // Move to tracer FILE!!!!!
-
-  
-
-  // pragma translate_off
 
   // Core and dispatch traces
   schnizo_core_trace_t     core_trace;
@@ -1466,7 +1456,7 @@ localparam int unsigned MaxNofRss =
       if (Xfrep) begin : gen_spatz_traces_rss_resreq_frep
         assign spatz_resreq_traces[rss][con] = '{
           valid:          0,
-	  // valid:          i_fu_stage.gen_rvv_block.i_spatz_block.gen_superscalar.i_res_stat.dest_masks_valid[rss] &&
+	        // valid:          i_fu_stage.gen_rvv_block.i_spatz_block.gen_superscalar.i_res_stat.dest_masks_valid[rss] &&
           //                i_fu_stage.gen_rvv_block.i_spatz_block.gen_superscalar.i_res_stat.dest_masks_ready[rss] &&
           //                i_fu_stage.gen_rvv_block.i_spatz_block.gen_superscalar.i_res_stat.dest_masks[rss][con],
           producer:       i_fu_stage.producer_to_string(

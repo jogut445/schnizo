@@ -215,7 +215,7 @@ module schnizo_res_stat_slot import schnizo_pkg::*; #(
   `FFAR(slot_q, slot_d, slot_reset_state, clk_i, rst_i);
 
   assign slot_reset_state = '{
-    spatz_raw_instr:     '0, 
+    spatz_raw_instr:     '0,
     is_occupied:          1'b0, // suppresses operand requests
     consumer_count:       '0,
     consumed_by:          '0,

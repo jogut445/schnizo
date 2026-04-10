@@ -276,8 +276,7 @@ def handle_dispatch_event(sim_time, cycle, priv_lvl, loop_state, extras,
             spatz_id = extras['disp_resp']
     elif ('producer' in extras):
         is_spatz = extras['producer'].startswith(FU_SPATZ)
-        spatz_id = extras['producer']
-    
+
     if (is_spatz):
         perf_metrics[-1]['spatz_issues'] += 1
 
@@ -342,7 +341,7 @@ def gen_dispatch_perfetto(sim_time, cycle, priv_lvl, loop_state, extras,
             fu_str = "SPATZLEP"
         else:
             fu_str = producer
-        
+
     else:
         raise ValueError(f"Not a valid loop state: {loop_state}\n")
 
@@ -372,7 +371,7 @@ def gen_dispatch_perfetto(sim_time, cycle, priv_lvl, loop_state, extras,
     # Immediately end SPATZ instructions as they have no retirement event
     elif (fu_str.startswith(FU_SPATZ)):
         trace.end_insn(fu_str_for_trace, (cycle+1) * CLOCK_PERIOD_NS)
-        
+
 
 def gen_retirement_perfetto(sim_time, cycle, priv_lvl, loop_state, extras, trace):
     # Only capture the retirement in regular modes.
@@ -680,11 +679,11 @@ def main():
     for fpu, pipeline in fpu_pipelines.items():
         if len(pipeline) != 0:
             print_warning(f"{len(pipeline)} unfinished operations detected for {fpu}.")
-    
+
     for spatz, pipeline in spatz_pipelines.items():
         if len(pipeline) != 0:
             print_warning(f"{len(pipeline)} unfinished Spatz operations detected for {spatz}.")
-    
+
     return 0
 
 

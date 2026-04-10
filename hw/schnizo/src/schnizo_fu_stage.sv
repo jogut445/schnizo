@@ -88,7 +88,7 @@ module schnizo_fu_stage import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
   parameter type         alu_result_t   = logic,
   parameter type         alu_res_val_t  = logic,
   // Spatz Result can be floating point or integer
-  parameter type         spatz_result_t = logic [FLEN-1:0], 
+  parameter type         spatz_result_t = logic [FLEN-1:0],
   parameter type         dreq_t         = logic,
   parameter type         drsp_t         = logic,
   // SPATZ Parameters
@@ -195,7 +195,7 @@ module schnizo_fu_stage import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
   output instr_tag_t      spatz_wb_result_tag_o,
   output logic            spatz_wb_result_valid_o,
   input  logic            spatz_wb_result_ready_i,
-  
+
   output logic            spatz_running_instrs_o,
 
   // SPATZ TCDM Ports
@@ -1478,7 +1478,7 @@ module schnizo_fu_stage import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
   };
 
 
-  
+
   assign spatz_busy = !spatz_issue_req_ready; // if we cannot dispatch, we are busy
 
   tcdm_req_chan_t [NumMemPortsPerSpatz-1:0] spatz_mem_req;
@@ -1517,7 +1517,7 @@ module schnizo_fu_stage import schnizo_pkg::*, schnizo_tracer_pkg::*; #(
     .issue_req_i             (acc_spatz_req        ), //Special care
     .issue_rsp_o             (acc_spatz_resp       ), //Special care
     .rsp_valid_o             (spatz_result_valid   ),
-    .rsp_ready_i             (spatz_result_ready   ),      
+    .rsp_ready_i             (spatz_result_ready   ),
     .rsp_o                   (acc_resp              ), //Special care
     .running_instrs_o        (spatz_running_instrs_o),
     .spatz_mem_req_o         (spatz_mem_req         ),
