@@ -1,0 +1,74 @@
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/reqrsp_interface/src/reqrsp_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/reqrsp_interface/src/reqrsp_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/reqrsp_interface/src/reqrsp_test.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz/src/rvv_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/tcdm_interface/src/tcdm_test.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/schnizo/src/schnizo_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/snitch/src/snitch_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/snitch/src/snitch_pma_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/reqrsp_interface/src/reqrsp_test.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/snitch/src/snitch_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/snitch/src/snitch_pma_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz/src/generated/spatz_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/tcdm_interface/src/tcdm_test.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/mem_interface/src/mem_test.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/schnizo/src/schnizo_tracer_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/schnizo/synth/schnizo_synth_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/snitch_ssr/src/snitch_ssr_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/snitch/src/riscv_instr.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/snitch/src/riscv_instr.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz_cc/src/axi_dma_pkg.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/system/spatz_cluster/src/generated/spatz_cluster_wrapper.sv
+-v /scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/system/spatz_cluster/src/spatz_cluster_peripheral/spatz_cluster_peripheral_reg_pkg.sv
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/dca_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/mem_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/reqrsp_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/schnizo/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/schnizo/synth
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_cluster/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_cluster/src/snitch_cluster_peripheral
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_fp_ss/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_ipu/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_ssr/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_vm/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/mem_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/reqrsp_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/snitch_test/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/snitch/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz_cc/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz/src/generated
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/tcdm_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/system/spatz_cluster/src/generated
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/system/spatz_cluster/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/system/spatz_cluster/src/spatz_cluster_peripheral
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/tcdm_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/target/asic/ihp13
++incdir+/scratch/sem26f11/old_schnizo/schnizo/target/sim/tb
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/dca_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/mem_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/reqrsp_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/schnizo/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/schnizo/synth
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_cluster/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_cluster/src/snitch_cluster_peripheral
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_fp_ss/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_ipu/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_ssr/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch_vm/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/snitch/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/mem_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/reqrsp_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/snitch_test/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/snitch/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz_cc/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz/src/generated
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/spatz/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/ip/tcdm_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/system/spatz_cluster/src/generated
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/system/spatz_cluster/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/spatz/hw/system/spatz_cluster/src/spatz_cluster_peripheral
++incdir+/scratch/sem26f11/old_schnizo/schnizo/hw/tcdm_interface/src
++incdir+/scratch/sem26f11/old_schnizo/schnizo/target/asic/ihp13
++incdir+/scratch/sem26f11/old_schnizo/schnizo/target/sim/tb
