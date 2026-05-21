@@ -12,21 +12,41 @@ FINAL_SYNTH_STAGE = '9'
 class ExperimentManager(eu.ExperimentManager):
 
     def derive_axes(self, experiment):
-        return eu.derive_axes_from_keys(experiment, keys=['num_slots'])
+        return eu.derive_axes_from_keys(experiment, keys=['name'])
 
 
 def gen_experiments():
-    # Define axes
-    num_slots_axis = [1, 4, 32]
-
-    # Generate list of experiments
-    experiments = []
-    for num_slots in num_slots_axis:
-        experiments.append({
+    experiments = [
+        {
             'design': 'schnizo_fu_stage_synth',
-            'num_slots': num_slots,
-            'hdl_params': {'NofRss': num_slots}
-        })
+            'name': 'default',
+            'hdl_params': {
+                'Xfrep': 1,
+                'MulInAlu0': 1,
+                'NofAlus': 3,
+                'NofLsus': 3,
+                'NofFpus': 1,
+                'AluNofRss': 2,
+                'LsuNofRss': 3,
+                'FpuNofRss': 4,
+                'AluNofConstants': 8,
+                'LsuNofConstants': 8,
+                'FpuNofConstants': 8,
+                'AluNofResRspPorts': 2,
+                'LsuNofResRspPorts': 2,
+                'FpuNofResRspPorts': 2,
+                'XF16': 1,
+                'XF16ALT': 1,
+                'XF8': 1,
+                'XF8ALT': 1,
+                'XFVEC': 1,
+                'RVV': 1,
+                'SpatzNofRss': 3,
+                'NumSpatzFPUs': 4,
+                'NumSpatzIPUs': 1,
+            }
+        }
+    ]
     return experiments
 
 

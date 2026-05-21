@@ -3,12 +3,30 @@
 // SPDX-License-Identifier: SHL-0.51
 
 module schnizo_fu_stage_synth #(
-  parameter bit          Xfrep           = 1,
-  parameter bit          MulInAlu0       = 1'b1,
-  parameter int unsigned NofAlus         = 1,
-  parameter int unsigned NofLsus         = 1,
-  parameter int unsigned NofFpus         = 1,
-  parameter int unsigned NofRss          = 1
+  parameter bit          Xfrep              = 1,
+  parameter bit          MulInAlu0          = 1'b1,
+  parameter int unsigned NofAlus            = 3,
+  parameter int unsigned NofLsus            = 3,
+  parameter int unsigned NofFpus            = 1,
+  parameter int unsigned AluNofRss          = 2,
+  parameter int unsigned LsuNofRss          = 3,
+  parameter int unsigned FpuNofRss          = 4,
+  parameter int unsigned AluNofConstants    = 8,
+  parameter int unsigned LsuNofConstants    = 8,
+  parameter int unsigned FpuNofConstants    = 8,
+  parameter int unsigned AluNofResRspPorts  = 2,
+  parameter int unsigned LsuNofResRspPorts  = 2,
+  parameter int unsigned FpuNofResRspPorts  = 2,
+  parameter bit          XF16               = 1'b1,
+  parameter bit          XF16ALT            = 1'b1,
+  parameter bit          XF8                = 1'b1,
+  parameter bit          XF8ALT             = 1'b1,
+  parameter bit          XFVEC              = 1'b1,
+  // Spatz / RVV parameters
+  parameter bit          RVV                = 1'b1,
+  parameter int unsigned SpatzNofRss        = 3,
+  parameter int unsigned NumSpatzFPUs       = 4,
+  parameter int unsigned NumSpatzIPUs       = 1
 ) (
   input  logic                                                    clk_i,
   input  logic                                                    rst_ni,
@@ -19,6 +37,7 @@ module schnizo_fu_stage_synth #(
   output logic                                                    all_rs_finish_o,
   input  schnizo_synth_pkg::disp_req_t                            disp_req_i,
   input  logic                                                    instr_exec_commit_i,
+  input  logic                                                    fpu_instr_exec_commit_i,
   input  logic               [NofAlus-1:0]                        alu_disp_reqs_valid_i,
   output logic               [NofAlus-1:0]                        alu_disp_reqs_ready_o,
   output schnizo_synth_pkg::disp_rsp_t          [NofAlus-1:0]     alu_disp_rsp_o,
@@ -37,55 +56,77 @@ module schnizo_fu_stage_synth #(
   output logic               [NofFpus-1:0]                        fpu_rs_full_o,
   output fpnew_pkg::status_t                                      fpu_status_o,
   output logic                                                    fpu_status_valid_o,
+  // Spatz dispatch
+  input  logic                                                    spatz_disp_reqs_valid_i,
+  output logic                                                    spatz_disp_reqs_ready_o,
+  output schnizo_synth_pkg::disp_rsp_t                            spatz_disp_rsp_o,
+  output logic                                                    spatz_loop_finish_o,
+  output logic                                                    spatz_rs_full_o,
+  // ALU / branch writeback
   output schnizo_synth_pkg::alu_result_t                          alu_wb_result_o,
   output schnizo_pkg::instr_tag_t                                 alu_wb_result_tag_o,
   output logic                                                    alu_wb_result_valid_o,
   input  logic                                                    alu_wb_result_ready_i,
   output schnizo_synth_pkg::alu_result_t                          branch_result_o,
+  // LSU writeback
   output schnizo_synth_pkg::data_t                                lsu_wb_result_o,
   output schnizo_pkg::instr_tag_t                                 lsu_wb_result_tag_o,
   output logic                                                    lsu_wb_result_valid_o,
   input  logic                                                    lsu_wb_result_ready_i,
+  // FPU writeback
   output logic [schnizo_synth_pkg::FLEN-1:0]                      fpu_wb_result_o,
   output schnizo_pkg::instr_tag_t                                 fpu_wb_result_tag_o,
   output logic                                                    fpu_wb_result_valid_o,
-  input  logic                                                    fpu_wb_result_ready_i
+  input  logic                                                    fpu_wb_result_ready_i,
+  // Spatz writeback
+  output logic [schnizo_synth_pkg::FLEN-1:0]                      spatz_wb_result_o,
+  output schnizo_pkg::instr_tag_t                                 spatz_wb_result_tag_o,
+  output logic                                                    spatz_wb_result_valid_o,
+  input  logic                                                    spatz_wb_result_ready_i,
+  output logic                                                    spatz_running_instrs_o,
+  // Spatz TCDM ports
+  output schnizo_synth_pkg::tcdm_req_t [NumSpatzFPUs-1:0]         spatz_tcdm_req_o,
+  input  schnizo_synth_pkg::tcdm_rsp_t [NumSpatzFPUs-1:0]         spatz_tcdm_rsp_i
 );
+
+  localparam int unsigned SpatzNofOperands = 2;
 
   localparam integer unsigned NofOperandIfs = NofAlus * 2 +
                                               NofLsus * 3 +
-                                              NofFpus * 3;
+                                              NofFpus * 3 +
+                                              (RVV ? SpatzNofOperands : 0);
 
-  localparam integer unsigned NofResReqIfs = NofAlus + NofLsus + NofFpus;
-
-  localparam integer unsigned NofResRspIfs = NofAlus * NofRss +
-                                             NofLsus * NofRss +
-                                             NofFpus * NofRss;
+  localparam integer unsigned NofResReqIfs = NofAlus + NofLsus + NofFpus +
+                                             (RVV ? 1 : 0);
 
   schnizo_fu_stage #(
     .Xfrep(Xfrep),
     .MulInAlu0(MulInAlu0),
     .NofAlus(NofAlus),
-    .AluNofRss(NofRss),
+    .AluNofRss(AluNofRss),
+    .AluNofConstants(AluNofConstants),
     .AluNofOperands(2),
-    .AluNofOpPorts(1),
     .AluNofResReqIfs(1),
-    .AluNofResRspIfs(NofRss),
+    .AluNofResRspPorts(AluNofResRspPorts),
     .NofLsus(NofLsus),
-    .LsuNofRss(NofRss),
+    .LsuNofRss(LsuNofRss),
+    .LsuNofConstants(LsuNofConstants),
     .LsuNofOperands(3),
-    .LsuNofOpPorts(1),
     .LsuNofResReqIfs(1),
-    .LsuNofResRspIfs(NofRss),
+    .LsuNofResRspPorts(LsuNofResRspPorts),
     .NofFpus(NofFpus),
-    .FpuNofRss(NofRss),
+    .FpuNofRss(FpuNofRss),
+    .FpuNofConstants(FpuNofConstants),
     .FpuNofOperands(3),
-    .FpuNofOpPorts(1),
     .FpuNofResReqIfs(1),
-    .FpuNofResRspIfs(NofRss),
+    .FpuNofResRspPorts(FpuNofResRspPorts),
+    .SpatzNofRss(SpatzNofRss),
+    .SpatzNofConstants(4),
+    .SpatzNofOperands(SpatzNofOperands),
+    .SpatzNofResReqIfs(RVV ? 1 : 0),
+    .SpatzNofResRspPorts(RVV ? 1 : 0),
     .NofOperandIfs(NofOperandIfs),
     .NofResReqIfs(NofResReqIfs),
-    .NofResRspIfs(NofResRspIfs),
     .XLEN(schnizo_synth_pkg::XLEN),
     .FLEN(schnizo_synth_pkg::FLEN),
     .OpLen(schnizo_synth_pkg::OpLen),
@@ -100,11 +141,11 @@ module schnizo_fu_stage_synth #(
     .FPUImplementation(schnizo_synth_pkg::FpuImplementation),
     .RVF(1),
     .RVD(1),
-    .XF16(0),
-    .XF16ALT(0),
-    .XF8(0),
-    .XF8ALT(0),
-    .XFVEC(0),
+    .XF16(XF16),
+    .XF16ALT(XF16ALT),
+    .XF8(XF8),
+    .XF8ALT(XF8ALT),
+    .XFVEC(XFVEC),
     .RegisterFPUIn(0),
     .RegisterFPUOut(0),
     .producer_id_t(schnizo_synth_pkg::producer_id_t),
@@ -118,7 +159,14 @@ module schnizo_fu_stage_synth #(
     .alu_result_t(schnizo_synth_pkg::alu_result_t),
     .alu_res_val_t(schnizo_synth_pkg::alu_res_val_t),
     .dreq_t(schnizo_synth_pkg::data_req_t),
-    .drsp_t(schnizo_synth_pkg::data_rsp_t)
+    .drsp_t(schnizo_synth_pkg::data_rsp_t),
+    .RVV(RVV),
+    .NumSpatzFPUs(NumSpatzFPUs),
+    .NumSpatzIPUs(NumSpatzIPUs),
+    .tcdm_req_chan_t(schnizo_synth_pkg::tcdm_req_chan_t),
+    .tcdm_rsp_chan_t(schnizo_synth_pkg::tcdm_rsp_chan_t),
+    .tcdm_req_t(schnizo_synth_pkg::tcdm_req_t),
+    .tcdm_rsp_t(schnizo_synth_pkg::tcdm_rsp_t)
   ) i_fu_stage (
     .clk_i,
     .rst_i(!rst_ni),
@@ -130,6 +178,7 @@ module schnizo_fu_stage_synth #(
     .all_rs_finish_o,
     .disp_req_i,
     .instr_exec_commit_i,
+    .fpu_instr_exec_commit_i,
     .alu_trace_o(),
     .lsu_trace_o(),
     .fpu_trace_o(),
@@ -160,6 +209,11 @@ module schnizo_fu_stage_synth #(
     .fpu_rs_full_o,
     .fpu_status_o,
     .fpu_status_valid_o,
+    .spatz_disp_reqs_valid_i,
+    .spatz_disp_reqs_ready_o,
+    .spatz_disp_rsp_o,
+    .spatz_loop_finish_o,
+    .spatz_rs_full_o,
     .alu_wb_result_o,
     .alu_wb_result_tag_o,
     .alu_wb_result_valid_o,
@@ -172,7 +226,14 @@ module schnizo_fu_stage_synth #(
     .fpu_wb_result_o,
     .fpu_wb_result_tag_o,
     .fpu_wb_result_valid_o,
-    .fpu_wb_result_ready_i
+    .fpu_wb_result_ready_i,
+    .spatz_wb_result_o,
+    .spatz_wb_result_tag_o,
+    .spatz_wb_result_valid_o,
+    .spatz_wb_result_ready_i,
+    .spatz_running_instrs_o,
+    .spatz_tcdm_req_o,
+    .spatz_tcdm_rsp_i
   );
 
 endmodule

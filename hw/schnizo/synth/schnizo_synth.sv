@@ -7,16 +7,26 @@ module schnizo_synth #(
 	parameter int unsigned NofAlus   = 3,
 	parameter int unsigned NofLsus   = 3,
 	parameter int unsigned NofFpus   = 1,
-	parameter int unsigned AluNofRss = 4,
-	parameter int unsigned LsuNofRss = 4,
+	parameter int unsigned AluNofRss = 2,
+	parameter int unsigned LsuNofRss = 3,
 	parameter int unsigned FpuNofRss = 4,
-  	parameter int unsigned AluNofConstants = 4,
-  	parameter int unsigned LsuNofConstants = 4,
-  	parameter int unsigned FpuNofConstants = 4,
+  	parameter int unsigned AluNofConstants = 8,
+  	parameter int unsigned LsuNofConstants = 8,
+  	parameter int unsigned FpuNofConstants = 8,
 	parameter bit          MulInAlu0 = 1'b1,
 	parameter integer unsigned AluNofResRspPorts = 2,
 	parameter integer unsigned LsuNofResRspPorts = 2,
-	parameter integer unsigned FpuNofResRspPorts = 2
+	parameter integer unsigned FpuNofResRspPorts = 2,
+	parameter bit          XF16     = 1'b1,
+	parameter bit          XF16ALT  = 1'b1,
+	parameter bit          XF8      = 1'b1,
+	parameter bit          XF8ALT   = 1'b1,
+	parameter bit          XFVEC    = 1'b1,
+	// Spatz / RVV parameters
+	parameter bit          RVV          = 1'b1,
+	parameter int unsigned SpatzNofRss  = 3,
+	parameter int unsigned NumSpatzFPUs = 4,
+	parameter int unsigned NumSpatzIPUs = 1
 ) (
 	input  logic                                       clk_i,
 	input  logic                                       rst_ni,
@@ -39,7 +49,10 @@ module schnizo_synth #(
 	input  schnizo_synth_pkg::data_rsp_t [NofLsus-1:0] data_rsp_i,
 	output snitch_pkg::core_events_t                   core_events_o,
 	output logic                                       barrier_o,
-	input  logic                                       barrier_i
+	input  logic                                       barrier_i,
+	// Spatz TCDM ports (NumSpatzFPUs = NumMemPortsPerSpatz for default config)
+	output schnizo_synth_pkg::tcdm_req_t [NumSpatzFPUs-1:0] spatz_tcdm_req_o,
+	input  schnizo_synth_pkg::tcdm_rsp_t [NumSpatzFPUs-1:0] spatz_tcdm_rsp_i
 );
 
 	schnizo #(
@@ -50,11 +63,11 @@ module schnizo_synth #(
 		.Xfrep(Xfrep),
 		.RVF(1),
 		.RVD(1),
-		.XF16(0),
-		.XF16ALT(0),
-		.XF8(0),
-		.XF8ALT(0),
-		.XFVEC(0),
+		.XF16(XF16),
+		.XF16ALT(XF16ALT),
+		.XF8(XF8),
+		.XF8ALT(XF8ALT),
+		.XFVEC(XFVEC),
 		.FLEN(schnizo_synth_pkg::FLEN),
 		.dreq_t(schnizo_synth_pkg::data_req_t),
 		.drsp_t(schnizo_synth_pkg::data_rsp_t),
@@ -81,7 +94,15 @@ module schnizo_synth #(
 		.DebugSupport(0),
 		.FPUImplementation(snitch_cluster_pkg::FPUImplementation[0]),
 		.RegisterFPUIn(0),
-		.RegisterFPUOut(0)
+		.RegisterFPUOut(0),
+		.SpatzNofRss(SpatzNofRss),
+		.RVV(RVV),
+		.NumSpatzFPUs(NumSpatzFPUs),
+		.NumSpatzIPUs(NumSpatzIPUs),
+		.tcdm_req_chan_t(schnizo_synth_pkg::tcdm_req_chan_t),
+		.tcdm_rsp_chan_t(schnizo_synth_pkg::tcdm_rsp_chan_t),
+		.tcdm_req_t(schnizo_synth_pkg::tcdm_req_t),
+		.tcdm_rsp_t(schnizo_synth_pkg::tcdm_rsp_t)
 	) i_schnizo (
 		.clk_i,
 		.rst_i(!rst_ni),
@@ -104,7 +125,9 @@ module schnizo_synth #(
 		.data_rsp_i,
 		.core_events_o,
 		.barrier_o,
-		.barrier_i
+		.barrier_i,
+		.tcdm_req_o(spatz_tcdm_req_o),
+		.tcdm_rsp_i(spatz_tcdm_rsp_i)
 	);
 
 endmodule

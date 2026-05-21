@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: SHL-0.51
 
 `include "reqrsp_interface/typedef.svh"
+`include "tcdm_interface/typedef.svh"
 
 package schnizo_synth_pkg;
 
@@ -21,6 +22,13 @@ package schnizo_synth_pkg;
   typedef logic [CoreUserWidth-1:0] user_t;
 
   `REQRSP_TYPEDEF_ALL(data, addr_t, data_t, strb_t, user_t)
+
+  // TCDM types for Spatz. Address width matches 128 kB TCDM (default config).
+  localparam int unsigned TCDMAddrWidth = 17;
+  typedef logic [TCDMAddrWidth-1:0] tcdm_addr_t;
+  // 2-bit user: [0] = is_dma, [1] = core_id (single compute core cluster)
+  typedef logic [1:0] tcdm_user_t;
+  `TCDM_TYPEDEF_ALL(tcdm, tcdm_addr_t, data_t, strb_t, tcdm_user_t)
 
   typedef struct packed {
     snitch_pkg::acc_addr_e addr;
