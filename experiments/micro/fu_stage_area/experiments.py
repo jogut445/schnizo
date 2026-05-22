@@ -20,31 +20,8 @@ def gen_experiments():
         {
             'design': 'schnizo_fu_stage_synth',
             'name': 'default',
-            'hdl_params': {
-                'Xfrep': 1,
-                'MulInAlu0': 1,
-                'NofAlus': 3,
-                'NofLsus': 3,
-                'NofFpus': 1,
-                'AluNofRss': 2,
-                'LsuNofRss': 3,
-                'FpuNofRss': 4,
-                'AluNofConstants': 8,
-                'LsuNofConstants': 8,
-                'FpuNofConstants': 8,
-                'AluNofResRspPorts': 2,
-                'LsuNofResRspPorts': 2,
-                'FpuNofResRspPorts': 2,
-                'XF16': 1,
-                'XF16ALT': 1,
-                'XF8': 1,
-                'XF8ALT': 1,
-                'XFVEC': 1,
-                'RVV': 1,
-                'SpatzNofRss': 3,
-                'NumSpatzFPUs': 4,
-                'NumSpatzIPUs': 1,
-            }
+            # All parameters match the module defaults which encode the default
+            # configuration from cfg/default.json. No hdl_params needed.
         }
     ]
     return experiments

@@ -24,7 +24,7 @@ module schnizo_fu_stage_synth #(
   parameter bit          XFVEC              = 1'b1,
   // Spatz / RVV parameters
   parameter bit          RVV                = 1'b1,
-  parameter int unsigned SpatzNofRss        = 3,
+  parameter int unsigned SpatzNofRss        = 4,
   parameter int unsigned NumSpatzFPUs       = 4,
   parameter int unsigned NumSpatzIPUs       = 1
 ) (

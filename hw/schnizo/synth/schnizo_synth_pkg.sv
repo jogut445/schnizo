@@ -78,6 +78,7 @@ package schnizo_synth_pkg;
     fpnew_pkg::fp_format_e  fpu_fmt_src;
     fpnew_pkg::fp_format_e  fpu_fmt_dst;
     fpnew_pkg::roundmode_e  fpu_rnd_mode;
+    logic [XLEN-1:0]        raw_instr;
   } fu_data_t;
 
   typedef struct packed {
